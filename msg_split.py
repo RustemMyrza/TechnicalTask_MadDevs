@@ -19,6 +19,10 @@ def split_message(html: str, max_len: int):
         if len(fragment) + len(line) > max_len:
             fragments.append(fragment)
             fragment = ""
+            if openedTags:
+                for el in reversed(openedTags):
+                    fragment += f"</{el}>"
+
 
         for symbol in line:
             fragment += symbol
