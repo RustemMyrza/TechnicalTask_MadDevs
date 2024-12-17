@@ -1,4 +1,6 @@
-MAX_LEN = 4096
+import argparse
+
+MAX_LEN = 4096  # Значение по умолчанию, если не передано в командной строке
 
 def split_message(html: str, max_len: int):
     if not html:  # Пустая строка
@@ -22,7 +24,6 @@ def split_message(html: str, max_len: int):
             if openedTags:
                 for el in reversed(openedTags):
                     fragment += f"</{el}>"
-
 
         for symbol in line:
             fragment += symbol
@@ -67,11 +68,6 @@ def split_message(html: str, max_len: int):
 
     return fragments
 
-
-
-
-
-
 def extract_text_from_html(file_path: str) -> str:
     try:
         with open(file_path, 'r', encoding='utf-8') as file:
@@ -79,12 +75,29 @@ def extract_text_from_html(file_path: str) -> str:
     except Exception as e:
         print(f"Ошибка при чтении файла: {e}")
         return ""
+
+def main():
+    # Создаем парсер для аргументов командной строки
+    parser = argparse.ArgumentParser(description="Split an HTML file into fragments of a specified maximum length.")
     
+    # Добавляем аргументы для максимальной длины и пути к файлу
+    parser.add_argument('--max-len', type=int, default=MAX_LEN, help="Maximum length of each fragment (default is 4096).")
+    parser.add_argument('file', type=str, help="Path to the HTML file to be processed.")
+    
+    # Разбираем аргументы
+    args = parser.parse_args()
+
+    # Читаем содержимое HTML-файла
+    text = extract_text_from_html(args.file)
+    
+    # Разбиваем HTML-содержимое на фрагменты
+    fragments = split_message(text, args.max_len)
+    
+    # Выводим фрагменты
+    for idx, fragment in enumerate(fragments, start=1):
+        print(f"Fragment #{idx}: {len(fragment)} characters")
+        print(fragment)
+        print("-" * 40)
 
 if __name__ == "__main__":
-    file_path = "source.html"  # Укажите путь к вашему HTML-файлу
-    text = extract_text_from_html(file_path)
-    fragments = split_message(text, MAX_LEN)
-    for el in fragments:
-        print("Fragment:")
-        print(el)
+    main()
